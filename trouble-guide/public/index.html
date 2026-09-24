@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISM Smart Guided Troubleshooter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090A0F;
+      --panel: rgba(18, 20, 29, 0.7);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --accent: #6366F1;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --accent-hover: #4F46E5;
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --card-bg: rgba(26, 29, 43, 0.6);
+      --card-border: rgba(255, 255, 255, 0.05);
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 40%);
+    }
+
+    /* Minimal Header */
+    header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(12px);
+      background: rgba(9, 10, 15, 0.8);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      color: white;
+      padding: 0.25rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-tag {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 400;
+    }
+
+    /* Container */
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 2.5rem 1.5rem 4rem;
+      flex: 1;
+    }
+
+    /* Mode Switcher Tabs */
+    .tab-nav {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--panel);
+      padding: 0.35rem;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      margin-bottom: 1.5rem;
+      width: fit-content;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn.active {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818CF8;
+      font-weight: 600;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Input Card */
+    .input-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2rem;
+    }
+
+    .input-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    textarea {
+      width: 100%;
+      background: rgba(15, 17, 25, 0.8);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 1rem;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      min-height: 90px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    /* Image Dropzone */
+    .dropzone {
+      border: 2px dashed var(--panel-border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      background: rgba(15, 17, 25, 0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .dropzone-icon {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .file-input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .preview-container {
+      display: none;
+      margin-top: 1rem;
+      position: relative;
+      width: fit-content;
+    }
+
+    .preview-img {
+      max-height: 180px;
+      border-radius: 8px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .remove-img-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Sample Chips */
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--panel-border);
+      color: var(--text-muted);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      background: rgba(99, 102, 241, 0.1);
+      color: #A5B4FC;
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    /* Primary Submit Button */
+    .btn-submit {
+      margin-top: 1.25rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.85rem 1.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px var(--accent-glow);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Results Header & Layout */
+    .results-container {
+      display: none;
+      flex-direction: column;
+      gap: 1.5rem;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--panel);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .meta-tags {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .meta-badge {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      font-weight: 600;
+    }
+
+    /* Decoded Image Analysis Box */
+    .analysis-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .analysis-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #A5B4FC;
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .analysis-detail {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    .extracted-text-box {
+      margin-top: 0.75rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #F3F4F6;
+      border-left: 3px solid var(--accent);
+    }
+
+    /* Action Cards & Steps */
+    .goal-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .goal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 0.4rem;
+    }
+
+    .goal-summary {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .action-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 1rem;
+      transition: border 0.2s;
+    }
+
+    .action-card:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .action-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .action-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #F9FAFB;
+    }
+
+    .action-badge {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .action-badge.auto {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818CF8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .action-badge.manual {
+      background: rgba(245, 158, 11, 0.15);
+      color: #FBBF24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .action-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+
+    /* Scratch Steps Timeline */
+    .step-list {
+      list-style: none;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+
+    .step-list::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 10px;
+      bottom: 10px;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .step-item {
+      position: relative;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #E5E7EB;
+    }
+
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-item::before {
+      content: '';
+      position: absolute;
+      left: -1.5rem;
+      top: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .deeplink-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #9CA3AF;
+      border: 1px solid var(--panel-border);
+    }
+
+    /* Spinner Loading */
+    .loading-spinner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span>PRISM</span>
+      <span class="brand-badge">Engine v2.0</span>
+    </div>
+    <div class="header-tag">Samsung Guided Diagnostics & Scratch Solution</div>
+  </header>
+
+  <main>
+    
+    <!-- Navigation Modes -->
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tab-text" onclick="switchMode('text')">
+        💬 Text Complaint
+      </button>
+      <button class="tab-btn" id="tab-image" onclick="switchMode('image')">
+        📷 Image / Error Screenshot
+      </button>
+    </div>
+
+    <!-- Text Complaint Mode -->
+    <div class="input-card" id="mode-text">
+      <div class="input-title">Describe the issue vagueness</div>
+      <div class="input-subtitle">Enter your device complaint to generate structured, step-by-step resolution steps.</div>
+      <textarea id="text-query" placeholder="e.g. screen flickers and battery dies fast..."></textarea>
+      
+      <div class="chip-list">
+        <span class="chip" onclick="fillQuery('screen flickers and battery dies fast')">Screen flickers & battery dies fast</span>
+        <span class="chip" onclick="fillQuery('overheating while charging and camera freezes')">Overheating & camera freeze</span>
+        <span class="chip" onclick="fillQuery('wifi disconnects randomly after update')">WiFi disconnects after update</span>
+      </div>
+
+      <button class="btn-submit" onclick="submitTextTroubleshoot()">
+        <span>Troubleshoot Issue</span>
+        <span>→</span>
+      </button>
+    </div>
+
+    <!-- Image Decoder Mode -->
+    <div class="input-card" id="mode-image" style="display: none;">
+      <div class="input-title">Upload Screenshot or Error Photo</div>
+      <div class="input-subtitle">Upload an error code, display artifact, or system dialog photo to decode and solve.</div>
+      
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon">📥</div>
+        <div><strong>Click or Drag & Drop</strong> image here</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Supports PNG, JPG, WEBP</div>
+        <input type="file" id="image-file" class="file-input" accept="image/*" onchange="handleFileSelect(event)">
+      </div>
+
+      <div class="preview-container" id="preview-container">
+        <img id="preview-img" class="preview-img" src="" alt="Preview">
+        <button class="remove-img-btn" onclick="clearImage()">✕</button>
+      </div>
+
+      <textarea id="image-notes" style="margin-top: 1rem; min-height: 60px;" placeholder="Optional context notes (e.g. happened after dropping or installing update)..."></textarea>
+
+      <button class="btn-submit" id="image-submit-btn" onclick="submitImageTroubleshoot()">
+        <span>Decode & Generate Solution</span>
+        <span>→</span>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-spinner" id="loading">
+      <div class="spinner"></div>
+      <span>Analyzing issue with PRISM AI engine...</span>
+    </div>
+
+    <!-- Output / Structured Results -->
+    <div class="results-container" id="results">
+      
+      <!-- Meta Specs Bar -->
+      <div class="meta-bar">
+        <div class="meta-tags">
+          <span class="meta-badge" id="res-model">Claude 3.5 Sonnet</span>
+          <span id="res-latency">⏱️ 320ms</span>
+          <span id="res-cache">⚡ Cache Miss</span>
+        </div>
+        <div id="res-score">Confidence Score: 0.95</div>
+      </div>
+
+      <!-- Decoded Image Card (Shown if image upload) -->
+      <div class="analysis-box" id="analysis-box" style="display: none;">
+        <div class="analysis-header">
+          <span>🔍 Decoded Error Analysis</span>
+        </div>
+        <div class="analysis-detail" id="analysis-error-name">Detected Issue: Dynamic Voltage Frequency Scaling Oscillation</div>
+        <div class="analysis-detail" style="color: var(--text-muted); margin-top: 0.25rem;" id="analysis-root-cause">Root Cause: Adaptive refresh rate conflicting with GPU governor logic.</div>
+        <div class="extracted-text-box" id="analysis-ocr">OCR Decoded Text: "Warning: Thermal throttling threshold exceeded."</div>
+      </div>
+
+      <!-- Main Goal Plan -->
+      <div class="goal-card">
+        <div class="goal-title" id="res-title">Troubleshooting Plan</div>
+        <div class="goal-summary" id="res-summary">Goal: Follow structured actions to resolve the complaint effectively.</div>
+      </div>
+
+      <!-- Action Cards Stack -->
+      <div id="actions-container"></div>
+
+    </div>
+
+  </main>
+
+  <script>
+    let currentMode = 'text';
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('tab-text').classList.toggle('active', mode === 'text');
+      document.getElementById('tab-image').classList.toggle('active', mode === 'image');
+      document.getElementById('mode-text').style.display = mode === 'text' ? 'block' : 'none';
+      document.getElementById('mode-image').style.display = mode === 'image' ? 'block' : 'none';
+    }
+
+    function fillQuery(text) {
+      document.getElementById('text-query').value = text;
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          document.getElementById('preview-img').src = evt.target.result;
+          document.getElementById('preview-container').style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function clearImage() {
+      document.getElementById('image-file').value = '';
+      document.getElementById('preview-img').src = '';
+      document.getElementById('preview-container').style.display = 'none';
+    }
+
+    async function submitTextTroubleshoot() {
+      const query = document.getElementById('text-query').value.trim();
+      if (!query) return alert('Please enter a complaint query.');
+
+      showLoading(true);
+      try {
+        const res = await fetch('/v1/troubleshoot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query })
+        });
+        const data = await res.json();
+        renderResults(data);
+      } catch (err) {
+        alert('Error communicating with backend: ' + err.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    async function submitImageTroubleshoot() {
+      const fileInput = document.getElementById('image-file');
+      if (!fileInput.files.length) return alert('Please select an image file to upload.');
+
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+      const notes = document.getElementById('image-notes').value.trim();
+      if (notes) formData.append('notes', notes);
+
+      showLoading(true);
+      try {
+        const res = await fetch('/v1/troubleshoot-image', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        renderResults(data, true);
+      } catch (err) {
+        alert('Error processing image: ' + err.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function showLoading(isLoading) {
+      document.getElementById('loading').style.display = isLoading ? 'flex' : 'none';
+      if (isLoading) {
+        document.getElementById('results').style.display = 'none';
+      }
+    }
+
+    function renderResults(data, isImageMode = false) {
+      const resultsDiv = document.getElementById('results');
+      const ctx = data.contexts && data.contexts[0] ? data.contexts[0] : null;
+
+      if (!ctx) {
+        alert('No troubleshooting context returned.');
+        return;
+      }
+
+      // Meta
+      document.getElementById('res-model').textContent = data.meta.model || 'AI Model';
+      document.getElementById('res-latency').textContent = `⏱️ ${data.meta.latency_ms}ms`;
+      document.getElementById('res-cache').textContent = data.meta.cache_hit ? '⚡ Cache Hit' : '🌐 Generated Fresh';
+      document.getElementById('res-score').textContent = `Confidence Score: ${ctx.score || 0.95}`;
+
+      // Decoded Image Analysis Box
+      const analysisBox = document.getElementById('analysis-box');
+      if (ctx.image_analysis) {
+        analysisBox.style.display = 'block';
+        document.getElementById('analysis-error-name').textContent = `Detected Issue: ${ctx.image_analysis.error_detected || 'Unknown Visual Error'}`;
+        document.getElementById('analysis-root-cause').textContent = `Root Cause Analysis: ${ctx.image_analysis.root_cause_analysis || 'Analyzed from image spectrum'}`;
+        document.getElementById('analysis-ocr').textContent = `Extracted Text / Error: "${ctx.image_analysis.extracted_text || 'None'}"`;
+      } else {
+        analysisBox.style.display = 'none';
+      }
+
+      // Goal & Summary
+      document.getElementById('res-title').textContent = ctx.title || 'Troubleshooting Plan';
+      document.getElementById('res-summary').textContent = ctx.summary || ctx.goal || 'Follow step-by-step actions below.';
+
+      // Actions & Scratch Steps
+      const container = document.getElementById('actions-container');
+      container.innerHTML = '';
+
+      const actions = ctx.actions || [];
+      actions.forEach((act, idx) => {
+        const card = document.createElement('div');
+        card.className = 'action-card';
+
+        let categoryClass = act.category === 'auto' ? 'auto' : 'manual';
+        let categoryLabel = act.category === 'auto' ? '⚡ Auto Settings Fix' : '🖐️ Manual Step';
+
+        let stepHTML = '';
+        if (act.stepGroups) {
+          act.stepGroups.forEach(group => {
+            if (group.groupTitle) {
+              stepHTML += `<div style="font-weight: 600; color: #9CA3AF; margin-bottom: 0.5rem; font-size: 0.85rem;">${group.groupTitle}</div>`;
+            }
+            stepHTML += `<ul class="step-list">`;
+            (group.steps || []).forEach(step => {
+              stepHTML += `<li class="step-item">${step}</li>`;
+            });
+            stepHTML += `</ul>`;
+
+            if (group.actionableDeeplink) {
+              stepHTML += `<div class="deeplink-box">🔗 Action Deeplink: <span>${group.actionableDeeplink}</span></div>`;
+            }
+          });
+        }
+
+        card.innerHTML = `
+          <div class="action-header">
+            <div class="action-name">${idx + 1}. ${act.actionName}</div>
+            <span class="action-badge ${categoryClass}">${categoryLabel}</span>
+          </div>
+          <div class="action-desc">${act.description || ''}</div>
+          ${stepHTML}
+        `;
+
+        container.appendChild(card);
+      });
+
+      resultsDiv.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
