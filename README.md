@@ -149,4 +149,8 @@ prism@samsung.com
 
 ---
 
-**Built for PRISM GenAI Hackathon 3rd Edition (2026-27)**
+**Built for PRISM GenAI Hackathon 3rd Edition (2026-27)*
+
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+Demo Video Link: https://youtu.be/Nm0PtH_SBFQ
