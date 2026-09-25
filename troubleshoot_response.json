@@ -1,0 +1,62 @@
+{
+  "contexts": [
+    {
+      "goal": "Comprehensive Troubleshooting & Resolution for: Screen flickers and battery dies fast",
+      "title": "Smart Diagnostics: Screen flickers and battery dies fast",
+      "score": 0.92,
+      "summary": "Generated a detailed multi-step resolution plan covering automated settings, manual verification steps, and hardware checks.",
+      "actions": [
+        {
+          "actionName": "Optimize Battery & Power Usage",
+          "description": "Inspect background app battery consumption and clear battery cache to stop drain.",
+          "category": "auto",
+          "severity": "Medium",
+          "estimatedTime": "2-3 mins",
+          "prerequisites": [
+            "Battery charged above 15%"
+          ],
+          "stepGroups": [
+            {
+              "groupTitle": "Battery Optimization",
+              "steps": [
+                "Open Device Settings > Battery and Device Care.",
+                "Tap 'Battery' and select 'Background usage limits'.",
+                "Enable 'Put unused apps to sleep' and restrict high drain background applications."
+              ],
+              "validationDeeplink": "bixby://settings/battery_care",
+              "actionableDeeplink": "bixby://settings/battery"
+            }
+          ]
+        },
+        {
+          "actionName": "Fix Display Refresh Rate & Brightness",
+          "description": "Adjust motion smoothness and disable adaptive brightness flicker triggers.",
+          "category": "manual",
+          "severity": "High",
+          "estimatedTime": "1-2 mins",
+          "prerequisites": [
+            "Ensure screen protective film is intact"
+          ],
+          "stepGroups": [
+            {
+              "groupTitle": "Display Settings Adjustment",
+              "steps": [
+                "Go to Settings > Display > Motion Smoothness.",
+                "Switch from 'Adaptive' (120Hz) to 'Standard' (60Hz) to isolate hardware frequency issue.",
+                "Toggle off 'Adaptive Brightness' and test screen flicker response."
+              ],
+              "validationDeeplink": "bixby://settings/display",
+              "actionableDeeplink": "bixby://settings/display"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "cache_hit": false,
+    "latency_ms": 0,
+    "model": "rule-engine-structured",
+    "cost_usd": 0.0
+  }
+}
