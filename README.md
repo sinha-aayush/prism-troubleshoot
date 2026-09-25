@@ -1,3 +1,6 @@
+Demo Video Link: https://youtu.be/Nm0PtH_SBFQ
+
+_________________________________________________________________________________________________________________________________________
 # Smart Guided Troubleshooting Engine
 
 **Theme 2 - PRISM GenAI Hackathon 3rd Edition (2026-27)**
@@ -152,5 +155,3 @@ prism@samsung.com
 **Built for PRISM GenAI Hackathon 3rd Edition (2026-27)*
 
 -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-Demo Video Link: https://youtu.be/Nm0PtH_SBFQ
